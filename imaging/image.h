@@ -121,6 +121,7 @@ public:
         return Vector2i{width_, height_};
     };
 
+    [[nodiscard]]
     const bool check_bounds(const int x, const int y) const {
         return x >= 0 && x < width() && y >= 0 && y < height();
     }
