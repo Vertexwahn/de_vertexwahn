@@ -1,5 +1,5 @@
 /*
- *  SPDX-FileCopyrightText: Copyright 2022-2023 Julian Amann <dev@vertexwahn.de>
+ *  SPDX-FileCopyrightText: Copyright 2022-2025 Julian Amann <dev@vertexwahn.de>
  *  SPDX-License-Identifier: Apache-2.0
  */
 
@@ -7,8 +7,10 @@
 #ifndef De_Vertexwahn_Math_Ray_ceb9b0b4_4236_4bfe_b918_11a02c72ad7c_h
 #define De_Vertexwahn_Math_Ray_ceb9b0b4_4236_4bfe_b918_11a02c72ad7c_h
 
-#include "math/point.h"
-#include "math/vector.h"
+#include "math/point.hpp"
+#include "math/vector.hpp"
+
+#include <cassert>
 
 DE_VERTEXWAHN_BEGIN_NAMESPACE
 
@@ -31,6 +33,11 @@ struct RayType {
     bool is_direction_vector_normalized() const {
         const Scalar epsilon{0.001};
         return std::abs(direction.norm() - Scalar{1.0}) < epsilon;
+    }
+
+    [[nodiscard]]
+    bool has_nans() const {
+        return std::isnan(min_t) || std::isnan(max_t) || origin.has_nans() || direction.has_nans();
     }
 
     Point origin;

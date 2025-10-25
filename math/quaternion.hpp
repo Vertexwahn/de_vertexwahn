@@ -8,7 +8,7 @@
 #ifndef De_Vertexwahn_Math_Quaternion_78d98dba_7801_450a_baf4_a6692e24adc8_h
 #define De_Vertexwahn_Math_Quaternion_78d98dba_7801_450a_baf4_a6692e24adc8_h
 
-#include "core/namespace.h"
+#include "core/namespace.hpp"
 
 #include <Eigen/Dense>
 

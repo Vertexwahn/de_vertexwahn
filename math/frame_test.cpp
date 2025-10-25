@@ -3,7 +3,7 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-#include "math/frame.h"
+#include "math/frame.hpp"
 
 #include "gmock/gmock.h"
 
@@ -42,4 +42,11 @@ TEST(Frame, GivenFrameIdenticalWithWorld_WhenTransformToWorld_ExpectSameCoordina
 TEST(Frame, abs_cos_theta) {
     EXPECT_THAT(abs_cos_theta(Vector3f{0.f, 1.f, 0.f}), 0.f);
     EXPECT_THAT(abs_cos_theta(Vector3f{0.f, 0.f, 1.f}), 1.f);
+}
+
+TEST(Frame, revised_onb) {
+    Vector3f b1, b2;
+    revised_onb(Normal3f{0.f, 0.f, -1.f}, b1, b2);
+    EXPECT_THAT(b1, (Vector3f{1.f, 0.f, 0.f}));
+    EXPECT_THAT(b2, (Vector3f{0.f, -1.f, 0.f}));
 }

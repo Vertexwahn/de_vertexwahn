@@ -7,10 +7,12 @@
 #ifndef De_Vertexwahn_Math_warping_50c70bb0_0a28_43db_a7c7_03aaec4146cd_h
 #define De_Vertexwahn_Math_warping_50c70bb0_0a28_43db_a7c7_03aaec4146cd_h
 
-#include "math/point.h"
-#include "math/util.h"
-#include "math/vector.h"
-#include "core/namespace.h"
+#include "math/constants.hpp"
+#include "math/point.hpp"
+#include "math/util.hpp"
+#include "math/vector.hpp"
+
+#include "core/namespace.hpp"
 
 DE_VERTEXWAHN_BEGIN_NAMESPACE
 
@@ -43,37 +45,6 @@ ScalarType warp_uniform_square_to_2x_pdf(const Point2<ScalarType> &sample) {
     return p_1(sample.x()) * p_1(sample.y());
 }
 
-// BEGIN-INTERNAL
-
-template <typename ScalarType>
-Point2<ScalarType> warp_uniform_square_to_tent(const Point2<ScalarType> &sample) {
-    auto p_1_inverse = [](const ScalarType t) {
-        assert(t >= 0);
-        assert(t <= 1);
-
-        if (t >= ScalarType{0} && t < ScalarType{0.5}) {
-            return -ScalarType{1} + std::sqrt(ScalarType{2} * t);
-        } else if (t >= 0.5 && t < ScalarType{1}) {
-            return ScalarType{1} - std::sqrt(ScalarType{2} * (ScalarType{1} - t));
-        } else {
-            throw std::runtime_error("Invalid parameter provided");
-        }
-    };
-
-    return Point2<ScalarType>(p_1_inverse(sample.x()), p_1_inverse(sample.y()));
-}
-
-template <typename ScalarType>
-ScalarType warp_uniform_square_to_tent_pdf(const Point2<ScalarType> &sample) {
-    auto p_1 = [](const ScalarType t) {
-        assert(t >= -ScalarType{1});
-        assert(t <= ScalarType{1});
-        return ScalarType{1} - std::abs(t);
-    };
-    return p_1(sample.x()) * p_1(sample.y());
-}
-
-// END-INTERNAL
 
 // The function SampleUniformDiskConcentric has been copied from pbrt-v4
 // and slightly modified
@@ -132,65 +103,6 @@ Vector2<ScalarType> sample_half_circle(const Point2<ScalarType> &sample) {
     return Vector2<ScalarType>(d.x(), d.y());
 }
 
-// BEGIN-INTERNAL
-
-template <typename ScalarType>
-Vector3<ScalarType> square_to_uniform_sphere(const Point2<ScalarType> &sample) {
-    ScalarType z = ScalarType{1} - ScalarType{2} * sample.x();
-    ScalarType r = std::sqrt(std::max(ScalarType{0}, ScalarType{1} - z * z));
-    ScalarType phi = ScalarType{2} * pif * sample.y();
-    return Vector3f(r * std::cos(phi), r * std::sin(phi), z);
-}
-
-template <typename ScalarType>
-ScalarType square_to_uniform_sphere_pdf(const Vector3<ScalarType> &v) {
-    return ScalarType{1} / (ScalarType{4} * pi_v<ScalarType>);
-}
-
-template <typename ScalarType>
-Vector3<ScalarType> square_to_cosine_hemisphere(const Point2<ScalarType> &sample) {
-    // shamelessly taken from pbrt-v3
-    Point2<ScalarType> d = warp_uniform_square_to_concentric_disk(sample);
-    ScalarType z = std::sqrt(std::max(ScalarType{0}, ScalarType{1} - d.x()*d.x() - d.y()*d.y()));
-    return Vector3<ScalarType>{d.x(), d.y(), z};
-}
-
-template <typename ScalarType>
-ScalarType square_to_cosine_hemisphere_pdf(const Vector3<ScalarType> &v) {
-    if (v.z() < ScalarType{0.}) {
-        return ScalarType{0.};
-    }
-    else {
-        // Transform v to polar coordinates
-        ScalarType r = v.norm();
-        ScalarType theta = acos(v.z() / r);
-        ScalarType cos_theta = cos(theta);
-        return cos_theta * (ScalarType{1.} / pi_v<ScalarType>);
-    }
-}
-
-template <typename ScalarType>
-Vector3<ScalarType> square_to_uniform_hemisphere(const Point2<ScalarType> &sample) {
-    // samples are generated to the hemisphere centered at (0,0,1)
-
-    // taken from PBRT
-    ScalarType z = sample.x();
-    ScalarType r = std::sqrt(std::max(ScalarType{0}, ScalarType{1} - z * z));
-    ScalarType phi = ScalarType{2} * pi_v<ScalarType> * sample.y();
-    return Vector3<ScalarType>(r * std::cos(phi), r * std::sin(phi), z);
-}
-
-template <typename ScalarType>
-ScalarType square_to_uniform_hemisphere_pdf(const Vector3<ScalarType> &sample) {
-    if (sample.z() >= 0.f) {
-        return ScalarType{1}/(ScalarType{2}*pi_v<ScalarType>);
-    }
-    else {
-        return ScalarType{0};
-    }
-}
-
-// END-INTERNAL
 
 DE_VERTEXWAHN_END_NAMESPACE
 

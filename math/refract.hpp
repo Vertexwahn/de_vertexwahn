@@ -9,9 +9,9 @@
 #ifndef De_Vertexwahn_Math_refraction_8ce77914_917c_4236_a751_491f3fe26041_h
 #define De_Vertexwahn_Math_refraction_8ce77914_917c_4236_a751_491f3fe26041_h
 
-#include "math/normal.h"
-#include "math/vector.h"
-#include "core/namespace.h"
+#include "math/normal.hpp"
+#include "math/vector.hpp"
+#include "core/namespace.hpp"
 
 DE_VERTEXWAHN_BEGIN_NAMESPACE
 

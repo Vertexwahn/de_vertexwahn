@@ -8,7 +8,7 @@
 #ifndef De_Vertexwahn_Math_Matrix_3b0aa566_7e67_433d_8fb6_075c84a4a70e_h
 #define De_Vertexwahn_Math_Matrix_3b0aa566_7e67_433d_8fb6_075c84a4a70e_h
 
-#include "core/namespace.h"
+#include "core/namespace.hpp"
 
 #include "Eigen/Core"
 #include "Eigen/Dense"
@@ -228,6 +228,11 @@ Matrix<ScalarType, 4, 4> orthographic_projection_matrix_RH(
     m.row(3) = Eigen::Matrix<ScalarType, 4, 1>(0, 0, 0, 1);
 
     return m;
+}
+
+template <typename ScalarType>
+Matrix<ScalarType, 4, 4> identity_matrix() {
+    return Eigen::Matrix<ScalarType, 4, 4>::Identity();
 }
 
 DE_VERTEXWAHN_END_NAMESPACE

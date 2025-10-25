@@ -1,8 +1,8 @@
 /*
- *  SPDX-FileCopyrightText: Copyright 2022-2023 Julian Amann <dev@vertexwahn.de>
+ *  SPDX-FileCopyrightText: Copyright 2022-2025 Julian Amann <dev@vertexwahn.de>
  *  SPDX-License-Identifier: Apache-2.0
  *
- *  This source file contains source code copied from pbrt-v3
+ *  This source file contains source code copied from pbrt-v4
  *  SPDX-FileCopyrightText: 1998-2016 Matt Pharr, Greg Humphreys, and Wenzel Jakob.
  *  SPDX-License-Identifier: BSD-2-Clause
  */
@@ -11,8 +11,10 @@
 #ifndef De_Vertexwahn_Math_AxisAlignedBoundingBoxType_e49220cc_5ee9_4ba7_95ca_bbecef080bc5_h
 #define De_Vertexwahn_Math_AxisAlignedBoundingBoxType_e49220cc_5ee9_4ba7_95ca_bbecef080bc5_h
 
-#include "math/point.h"
-#include "math/vector.h"
+#include "math/point.hpp"
+#include "math/vector.hpp"
+
+#include <cassert>
 
 DE_VERTEXWAHN_BEGIN_NAMESPACE
 

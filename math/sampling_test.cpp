@@ -3,8 +3,8 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-#include "flatland/rendering/sampler.h"
-#include "math/sampling.h"
+#include "flatland/rendering/sampler.hpp"
+#include "math/sampling.hpp"
 using namespace de_vertexwahn;
 
 #include "hypothesis.h"
@@ -141,48 +141,3 @@ TEST(Warping, XiQuadartTest_warpUniformSquareToConcentricDisk) {
     EXPECT_THAT(result.second, testing::HasSubstr("Accepted the null hypothesis"));
 }
 
-// BEGIN-INTERNAL
-
-TEST(Warping, warp_uniform_square_to_tent_pdf) {
-    // Act
-    float s1 = warp_uniform_square_to_tent_pdf(Point2f{0.0f, 0.0f});
-    float s2 = warp_uniform_square_to_tent_pdf(Point2f{0.75f, 0.0f});
-
-    // Assert
-    EXPECT_THAT(s1, 1.0f);
-    EXPECT_THAT(s2, 0.25f);
-}
-
-TEST(Warping, warp_uniform_square_to_tent) {
-    // Act
-    Point2f s = warp_uniform_square_to_tent(Point2f{0.f, 0.f});
-
-    // Assert
-    EXPECT_THAT(s.x(), -1.f);
-    EXPECT_THROW(warp_uniform_square_to_tent(Point2f(1.f, 0.f)), std::runtime_error);
-}
-
-TEST(Warping, square_to_uniform_hemisphere_pdf) {
-    // Act
-    float density = square_to_uniform_hemisphere_pdf(Vector3f{0.f, 0.f, 0.f});
-
-    // Assert
-    EXPECT_THAT(density, ::testing::FloatNear(0.159155f, 0.001f));
-}
-
-TEST(Warping, square_to_uniform_hemisphere_pdf2) {
-    // Act
-    float density = square_to_uniform_hemisphere_pdf(Vector3f{0.f, 0.f, -1.f});
-
-    // Assert
-    EXPECT_THAT(density, ::testing::FloatNear(0.0f, 0.001f));
-}
-
-TEST(Warping, square_to_cosine_hemisphere) {
-    Vector3f v = square_to_cosine_hemisphere(Point2f{0.f, 0.f});
-    EXPECT_THAT(v.x(), ::testing::FloatNear(-0.707107, 0.001f));
-    EXPECT_THAT(v.y(), ::testing::FloatNear(-0.707107, 0.001f));
-    EXPECT_THAT(v.z(), ::testing::FloatNear(0.000172633, 0.001f));
-}
-
-// END-INTERNAL

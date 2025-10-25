@@ -7,8 +7,8 @@
 #ifndef De_Vertexwahn_Math_Frame_ddd0adba_4e78_40c5_882e_e8c4ea82c836_h
 #define De_Vertexwahn_Math_Frame_ddd0adba_4e78_40c5_882e_e8c4ea82c836_h
 
-#include "math/normal.h"
-#include "math/vector.h"
+#include "math/normal.hpp"
+#include "math/vector.hpp"
 
 DE_VERTEXWAHN_BEGIN_NAMESPACE
 

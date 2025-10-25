@@ -7,7 +7,7 @@
 #ifndef De_Vertexwahn_Math_Normal_c861abf5_ddbf_4bba_bd12_7cb61a99245c_h
 #define De_Vertexwahn_Math_Normal_c861abf5_ddbf_4bba_bd12_7cb61a99245c_h
 
-#include "core/namespace.h"
+#include "core/namespace.hpp"
 
 #include "Eigen/Core"
 #include "Eigen/Dense"
@@ -28,6 +28,7 @@ struct NormalType : public Eigen::Matrix<ScalarType, Dimension, 1> {
 
     using Base::operator=;
 
+    [[nodiscard]]
     bool has_nans() const {
         for (size_t i=0; i<Dimension; ++i) {
             if(std::isnan(this->coeff(i))) {

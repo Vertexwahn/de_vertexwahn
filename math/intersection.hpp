@@ -7,9 +7,9 @@
 #ifndef De_Vertexwahn_Math_Intersection_391cb7cb_bd5e_4cf0_a115_66f7cc86f730_h
 #define De_Vertexwahn_Math_Intersection_391cb7cb_bd5e_4cf0_a115_66f7cc86f730_h
 
-#include "math/normal.h"
-#include "math/point.h"
-#include "math/vector.h"
+#include "math/normal.hpp"
+#include "math/point.hpp"
+#include "math/vector.hpp"
 
 DE_VERTEXWAHN_BEGIN_NAMESPACE
 

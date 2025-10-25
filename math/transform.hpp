@@ -7,11 +7,11 @@
 #ifndef De_Vertexwahn_Math_Transform_5c51bd58_f3a5_4ce3_9921_c4906c57beb2_h
 #define De_Vertexwahn_Math_Transform_5c51bd58_f3a5_4ce3_9921_c4906c57beb2_h
 
-#include "math/matrix.h"
-#include "math/normal.h"
-#include "math/point.h"
-#include "math/ray.h"
-#include "math/vector.h"
+#include "math/matrix.hpp"
+#include "math/normal.hpp"
+#include "math/point.hpp"
+#include "math/ray.hpp"
+#include "math/vector.hpp"
 
 #include <iostream>
 
@@ -263,7 +263,7 @@ Transform44Type<ScalarType> look_at(const Point3<ScalarType> &origin,
                  right.z(), corrected_up.z(), forward.z(), origin.z(),
                  ScalarType{0.0}, ScalarType{0.0}, ScalarType{0.0}, ScalarType{1.0};
 
-    return Transform44Type<ScalarType>{(transform).inverse()};
+    return Transform44Type<ScalarType>{transform.inverse()};
 }
 
 template <typename ScalarType>

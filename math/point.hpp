@@ -1,5 +1,5 @@
 /*
- *  SPDX-FileCopyrightText: Copyright 2022-2023 Julian Amann <dev@vertexwahn.de>
+ *  SPDX-FileCopyrightText: Copyright 2022-2025 Julian Amann <dev@vertexwahn.de>
  *  SPDX-License-Identifier: Apache-2.0
  */
 
@@ -7,7 +7,7 @@
 #ifndef De_Vertexwahn_Math_Point_8f63f4af_19a9_4406_8d7a_a0db4f946277_h
 #define De_Vertexwahn_Math_Point_8f63f4af_19a9_4406_8d7a_a0db4f946277_h
 
-#include "core/namespace.h"
+#include "core/namespace.hpp"
 
 #include "Eigen/Core"
 #include "Eigen/Dense"
@@ -32,16 +32,18 @@ struct PointType : public Eigen::Matrix<ScalarType, Dimension, 1> {
     PointType(const Eigen::MatrixBase<Derived>& src) : Base(src) {
     }
 
-    PointType<ScalarType, 3> xyz() const {
-        return PointType<ScalarType, 3>(Base::x(), Base::y(), Base::z());
-    }
+    using Base::operator=;
 
+    // swizzle operators
     PointType<ScalarType, 2> zy() const {
         return PointType<ScalarType, 2>(Base::z(), Base::y());
     }
 
-    using Base::operator=;
+    PointType<ScalarType, 3> xyz() const {
+        return PointType<ScalarType, 3>(Base::x(), Base::y(), Base::z());
+    }
 
+    [[nodiscard]]
     bool has_nans() const {
         for (size_t i=0; i<Dimension; ++i) {
             if(std::isnan(this->coeff(i))) {
