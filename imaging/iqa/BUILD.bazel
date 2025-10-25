@@ -1,0 +1,25 @@
+load("@rules_cc//cc:cc_library.bzl", "cc_library")
+load("@rules_cc//cc:cc_test.bzl", "cc_test")
+
+cc_library(
+    name = "iqa",
+    srcs = ["iqa.cpp"],
+    hdrs = ["iqa.hpp"],
+    visibility = ["//visibility:public"],
+    deps = [
+        "//core:reference_counted",
+        "//imaging:image",
+    ],
+)
+
+cc_test(
+    name = "iqa_test",
+    size = "small",
+    srcs = [
+        "iqa_test.cpp",
+    ],
+    deps = [
+        ":iqa",
+        "@googletest//:gtest_main",
+    ],
+)

@@ -7,9 +7,9 @@
 #ifndef De_Vertexwahn_Imaging_io_webp_1ee82240_0345_4d89_916d_2757d731b9bd_h
 #define De_Vertexwahn_Imaging_io_webp_1ee82240_0345_4d89_916d_2757d731b9bd_h
 
-#include "imaging/image.h"
+#include "imaging/image.hpp"
 
-#include "core/reference_counted.h"
+#include "core/reference_counted.hpp"
 
 #include <string_view>
 

@@ -7,7 +7,7 @@
 #ifndef De_Vertexwahn_Imaging_io_ppm_a17ff2bc_adf7_432f_a1ec_3dbd77af587d_h
 #define De_Vertexwahn_Imaging_io_ppm_a17ff2bc_adf7_432f_a1ec_3dbd77af587d_h
 
-#include "imaging/image.h"
+#include "imaging/image.hpp"
 
 #include <string_view>
 

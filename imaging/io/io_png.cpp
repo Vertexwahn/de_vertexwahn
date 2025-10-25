@@ -3,9 +3,9 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-#include "imaging/io/io_png.h"
-#include "imaging/color_converter.h"
-#include "core/logging.h"
+#include "imaging/io/io_png.hpp"
+#include "imaging/color_converter.hpp"
+#include "core/logging.hpp"
 
 #include "png.h"
 
@@ -63,6 +63,7 @@ ReferenceCounted<Image4b> load_image_png_as_Image4b(std::string_view filename) {
     if(!info) abort();
 
     if(setjmp(png_jmpbuf(png))) {
+        fclose(fp);
         throw std::runtime_error("Invalid file format");
         abort();
     }
@@ -121,7 +122,7 @@ ReferenceCounted<Image4b> load_image_png_as_Image4b(std::string_view filename) {
     auto image = make_reference_counted<Image4b>(width, height);
     for(int y = 0; y < height; y++) {
         for(int x = 0; x < width; x++) {
-                Color4b color{
+                ColorRGBA4b color{
                     row_pointers[y][x * 4 + 0],
                     row_pointers[y][x * 4 + 1],
                     row_pointers[y][x * 4 + 2],
@@ -145,8 +146,8 @@ ReferenceCounted<Image3f> convert_to_Image3f(const Image4b* image) {
 
     for (int y = 0; y < image->height(); ++y) {
         for (int x = 0; x < image->width(); ++x) {
-            Color4b c = image->get_pixel(x, y);
-            Color3f converted_color = ColorConverter::convertTo<Color3f>(c);
+            ColorRGBA4b c = image->get_pixel(x, y);
+            ColorRGB3f converted_color = ColorConverter::convertTo<ColorRGB3f>(c);
             converted_image->set_pixel(x,y,converted_color);
         }
     }
@@ -159,8 +160,8 @@ ReferenceCounted<Image4f> convert_to_Image4f(const Image4b* image) {
 
     for (int y = 0; y < image->height(); ++y) {
         for (int x = 0; x < image->width(); ++x) {
-            Color4b c = image->get_pixel(x, y);
-            Color4f converted_color = ColorConverter::convertTo<Color4f>(c);
+            ColorRGBA4b c = image->get_pixel(x, y);
+            ColorRGBA4f converted_color = ColorConverter::convertTo<ColorRGBA4f>(c);
             converted_image->set_pixel(x,y,converted_color);
         }
     }
@@ -194,30 +195,33 @@ ReferenceCounted<Image4f> load_image_png_as_Image4f(std::string_view filename) {
     }
 }
 
-bool store_png(const char *filename, const Image4b &image) {
+bool store_png(const char *filename, const Image3b &image) {
     int width = image.width();
     int height = image.height();
 
     FILE *fp = fopen(filename, "wb");
+
     if (fp == nullptr) {
-        LOG(INFO) << "Store PNG: Could not open file " << filename;
+        if (fp != nullptr) fclose(fp);
+        LOG_INFO_WITH_LOCATION("Store PNG: Could not open file {}", filename);
         return false;
     }
 
     png_bytep row = nullptr;
     png_structp png_ptr = png_create_write_struct(PNG_LIBPNG_VER_STRING, nullptr, nullptr, nullptr);
     if (png_ptr == nullptr) {
-        LOG(ERROR) << "Store PNG: Could not allocate write struct (" << filename << ")";
+        if (fp != nullptr) fclose(fp);
+        LOG_ERROR_WITH_LOCATION("Store PNG: Could not allocate write struct ({})", filename);
         return false;
     }
 
     png_infop info_ptr = png_create_info_struct(png_ptr);
     if (info_ptr == nullptr) {
-        LOG(ERROR) << "Store PNG: Could not allocate info struct (" << filename << ")";
+        LOG_ERROR_WITH_LOCATION("Store PNG: Could not allocate info struct ({})", filename);
     }
 
     if (setjmp(png_jmpbuf(png_ptr))) {
-        LOG(ERROR) << "Store PNG: Set jumpbuf failed (" << filename << ")";
+        LOG_ERROR_WITH_LOCATION("Store PNG: Set jumpbuf failed ({})", filename);
     }
 
     png_init_io(png_ptr, fp);
@@ -232,7 +236,67 @@ bool store_png(const char *filename, const Image4b &image) {
 
     for (int y = 0; y < height; ++y) {
         for (int x = 0; x < width; ++x) {
-            Color4b c = image.get_pixel(x, y).clamp(0, 255);
+            ColorRGB3b c = image.get_pixel(x, y).clamp(0, 255);
+            row[x * 4 + 0] = c.red();
+            row[x * 4 + 1] = c.green();
+            row[x * 4 + 2] = c.blue();
+            row[x * 4 + 3] = 255;
+        }
+        png_write_row(png_ptr, row); //I think this causes the segmentation fault
+    }
+
+    png_write_end(png_ptr, info_ptr);
+
+    if (info_ptr != nullptr) png_free_data(png_ptr, info_ptr, PNG_FREE_ALL, -1);
+    if (row != nullptr) free(row);
+    if (png_ptr != nullptr) png_destroy_write_struct(&png_ptr, (png_infopp) nullptr);
+    if (fp != nullptr) fclose(fp);
+
+    return true;
+}
+
+bool store_png(const char *filename, const Image4b &image) {
+    int width = image.width();
+    int height = image.height();
+
+    FILE *fp = fopen(filename, "wb");
+
+    if (fp == nullptr) {
+        if (fp != nullptr) fclose(fp);
+        LOG_INFO_WITH_LOCATION("Store PNG: Could not open file {}", filename);
+        return false;
+    }
+
+    png_bytep row = nullptr;
+    png_structp png_ptr = png_create_write_struct(PNG_LIBPNG_VER_STRING, nullptr, nullptr, nullptr);
+    if (png_ptr == nullptr) {
+        if (fp != nullptr) fclose(fp);
+        LOG_ERROR_WITH_LOCATION("Store PNG: Could not allocate write struct ({})", filename);
+        return false;
+    }
+
+    png_infop info_ptr = png_create_info_struct(png_ptr);
+    if (info_ptr == nullptr) {
+        LOG_ERROR_WITH_LOCATION("Store PNG: Could not allocate info struct ({})", filename);
+    }
+
+    if (setjmp(png_jmpbuf(png_ptr))) {
+        LOG_ERROR_WITH_LOCATION("Store PNG: Set jumpbuf failed ({})", filename);
+    }
+
+    png_init_io(png_ptr, fp);
+
+    png_set_IHDR(png_ptr, info_ptr, width, height,
+                 8, PNG_COLOR_TYPE_RGB_ALPHA, PNG_INTERLACE_NONE,
+                 PNG_COMPRESSION_TYPE_BASE, PNG_FILTER_TYPE_BASE);
+
+    png_write_info(png_ptr, info_ptr);
+
+    row = (png_bytep) malloc(sizeof(png_byte) * width * 4); //I think the problems start here
+
+    for (int y = 0; y < height; ++y) {
+        for (int x = 0; x < width; ++x) {
+            ColorRGBA4b c = image.get_pixel(x, y).clamp(0, 255);
             row[x * 4 + 0] = c.red();
             row[x * 4 + 1] = c.green();
             row[x * 4 + 2] = c.blue();
@@ -257,24 +321,25 @@ bool store_png(const char *filename, const Image3f &image) {
 
     FILE *fp = fopen(filename, "wb");
     if (fp == nullptr) {
-        LOG(INFO) << "Store PNG: Could not open file " << filename;
+        LOG_INFO_WITH_LOCATION("Store PNG: Could not open file {}", filename);
         return false;
     }
 
     png_bytep row = nullptr;
     png_structp png_ptr = png_create_write_struct(PNG_LIBPNG_VER_STRING, nullptr, nullptr, nullptr);
     if (png_ptr == nullptr) {
-        LOG(ERROR) << "Store PNG: Could not allocate write struct (" << filename << ")";
+        if (fp != nullptr) fclose(fp);
+        LOG_ERROR_WITH_LOCATION("Store PNG: Could not allocate write struct ({})", filename);
         return false;
     }
 
     png_infop info_ptr = png_create_info_struct(png_ptr);
     if (info_ptr == nullptr) {
-        LOG(ERROR) << "Store PNG: Could not allocate info struct (" << filename << ")";
+        LOG_ERROR_WITH_LOCATION("Store PNG: Could not allocate info struct ({})", filename);
     }
 
     if (setjmp(png_jmpbuf(png_ptr))) {
-        LOG(ERROR) << "Store PNG: Set jumpbuf failed (" << filename << ")";
+        LOG_ERROR_WITH_LOCATION("Store PNG: Set jumpbuf failed ({})", filename);
     }
 
     png_init_io(png_ptr, fp);

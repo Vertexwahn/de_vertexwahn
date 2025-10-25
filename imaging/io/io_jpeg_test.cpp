@@ -5,7 +5,7 @@
 
 #include "gmock/gmock.h"
 
-#include "imaging/io/io_jpeg.h"
+#include "imaging/io/io_jpeg.hpp"
 
 #include <algorithm>
 #include <filesystem>
@@ -46,7 +46,7 @@ TEST(Image, store_jpeg) {
 
     for(int x = 0; x < image.width(); ++x) {
         for(int y = 0; y < image.height(); ++y) {
-            image.set_pixel(x, y, Color4b{255, 0, 0, 255});
+            image.set_pixel(x, y, ColorRGBA4b{255, 0, 0, 255});
         }
     }
 
@@ -63,9 +63,24 @@ TEST(Image, store_jpeg2) {
 
     for(int x = 0; x < image.width(); ++x) {
         for(int y = 0; y < image.height(); ++y) {
-            image.set_pixel(x, y, Color3f{1.f, 0.f, 0.f});
+            image.set_pixel(x, y, ColorRGB3f{1.f, 0.f, 0.f});
         }
     }
 
     store_jpeg("red_square.jpg", image);
+}
+
+TEST(Image, load_image_jpeg) {
+    auto image = load_image_jpeg("imaging/tests/data/red_square_quality100.jpg");
+
+    EXPECT_THAT(image.width(), 768);
+    EXPECT_THAT(image.height(), 768);
+
+    for(int x = 0; x < image.width(); ++x) {
+        for(int y = 0; y < image.height(); ++y) {
+            EXPECT_LE(std::abs(image.get_pixel(x, y).red()-1.0f), 0.1f);
+            EXPECT_LE(std::abs(image.get_pixel(x, y).green()), 0.f);
+            EXPECT_LE(std::abs(image.get_pixel(x, y).blue()), 0.f);
+        }
+    }
 }

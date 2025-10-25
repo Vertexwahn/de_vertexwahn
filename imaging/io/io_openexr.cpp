@@ -3,7 +3,7 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-#include "imaging/io/io_openexr.h"
+#include "imaging/io/io_openexr.hpp"
 
 #include "src/lib/OpenEXR/ImfArray.h"
 #include "src/lib/OpenEXR/ImfChannelList.h"
@@ -93,7 +93,7 @@ Image3f load_image_openexr(std::string_view filename) {
 
     for (int y = 0; y < height; ++y) {
         for (int x = 0; x < width; ++x) {
-            Color3f color{rPixels[y][x], gPixels[y][x], bPixels[y][x]};
+            ColorRGB3f color{rPixels[y][x], gPixels[y][x], bPixels[y][x]};
             img.set_pixel(x, y, color);
         }
     }
@@ -112,20 +112,20 @@ void store_open_exr(const std::string_view &filename, const Image3f &image) {
     channels.insert("G", Imf::Channel(Imf::FLOAT));
     channels.insert("B", Imf::Channel(Imf::FLOAT));
 
-    FrameBuffer frameBuffer;
-    size_t compStride = sizeof(float),
-            pixelStride = 3 * compStride,
-            rowStride = pixelStride * image.width();
+    FrameBuffer frame_buffer;
+    size_t comp_stride = sizeof(float);
+    size_t pixel_stride = 3 * comp_stride;
+    size_t row_stride = pixel_stride * image.width();
 
     char *data = reinterpret_cast<char *>(image.data());
-    frameBuffer.insert("R", Imf::Slice(Imf::FLOAT, data, pixelStride, rowStride));
-    data += compStride;
-    frameBuffer.insert("G", Imf::Slice(Imf::FLOAT, data, pixelStride, rowStride));
-    data += compStride;
-    frameBuffer.insert("B", Imf::Slice(Imf::FLOAT, data, pixelStride, rowStride));
+    frame_buffer.insert("R", Imf::Slice(Imf::FLOAT, data, pixel_stride, row_stride));
+    data += comp_stride;
+    frame_buffer.insert("G", Imf::Slice(Imf::FLOAT, data, pixel_stride, row_stride));
+    data += comp_stride;
+    frame_buffer.insert("B", Imf::Slice(Imf::FLOAT, data, pixel_stride, row_stride));
 
     OutputFile file(filename.data(), header);
-    file.setFrameBuffer(frameBuffer);
+    file.setFrameBuffer(frame_buffer);
     file.writePixels(image.height());
 }
 

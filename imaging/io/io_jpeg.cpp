@@ -3,12 +3,50 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-#include "imaging/io/io_jpeg.h"
+#include "imaging/io/io_jpeg.hpp"
 
 #include "jpeglib.h"
-//#include <setjmp.h>
 
 DE_VERTEXWAHN_BEGIN_NAMESPACE
+
+Image3f load_image_jpeg(const char* filename) {
+    struct jpeg_decompress_struct cinfo;
+    struct jpeg_error_mgr jerr;
+
+    FILE * infile;
+    JSAMPARRAY buffer;
+    int row_stride;
+
+    if ((infile = fopen(filename, "rb")) == nullptr) {
+        fprintf(stderr, "can't open %s\n", filename);
+        exit(1);
+    }
+
+    cinfo.err = jpeg_std_error(&jerr);
+    jpeg_create_decompress(&cinfo);
+    jpeg_stdio_src(&cinfo, infile);
+    (void) jpeg_read_header(&cinfo, TRUE);
+    (void) jpeg_start_decompress(&cinfo);
+
+    row_stride = cinfo.output_width * cinfo.output_components;
+    buffer = (*cinfo.mem->alloc_sarray)
+            ((j_common_ptr) &cinfo, JPOOL_IMAGE, row_stride, 1);
+
+    Image3f image(cinfo.output_width, cinfo.output_height);
+
+    while (cinfo.output_scanline < cinfo.output_height) {
+        (void) jpeg_read_scanlines(&cinfo, buffer, 1);
+        for(int x = 0; x < cinfo.output_width; ++x) {
+            image.set_pixel(x, cinfo.output_scanline - 1, ColorRGB3f(buffer[0][x * 3] / 255.f, buffer[0][x * 3 + 1] / 255.f, buffer[0][x * 3 + 2] / 255.f));
+        }
+    }
+
+    (void) jpeg_finish_decompress(&cinfo);
+    jpeg_destroy_decompress(&cinfo);
+    fclose(infile);
+
+    return image;
+}
 
 bool store_jpeg(const char *filename, const Image4b &image) {
     int image_width = image.width();
@@ -81,10 +119,10 @@ bool store_jpeg(const char *filename, const Image3f &image) {
         }
     }
 
-    int row_stride = sizeof(char8_t) * image_width * 3;
+    //int row_stride = sizeof(char8_t) * image_width * 3;
 
-    struct jpeg_compress_struct cinfo;
-    struct jpeg_error_mgr jerr;
+    jpeg_compress_struct cinfo;
+    jpeg_error_mgr jerr;
 
     FILE * outfile;
     JSAMPROW row_pointer[1];
@@ -107,7 +145,7 @@ bool store_jpeg(const char *filename, const Image3f &image) {
     jpeg_set_quality(&cinfo, quality, TRUE);
     jpeg_start_compress(&cinfo, TRUE);
 
-    row_stride = image_width * 3;
+    int row_stride = image_width * 3;
 
     while (cinfo.next_scanline < cinfo.image_height) {
         row_pointer[0] = & image_buffer[cinfo.next_scanline * row_stride];

@@ -3,18 +3,19 @@
  *  SPDX-License-Identifier: CC-BY-SA-3.0
  */
 
-#include "io_webp.h"
+#include "io_webp.hpp"
 
 #include "webp/encode.h"
 #include "webp/decode.h"
 
 #include <filesystem>
 #include <fstream>
+#include <iterator>
 
 DE_VERTEXWAHN_BEGIN_NAMESPACE
 
 bool store_webp(const char *filename, const Image4b &image) {
-    int stride = image.width() * static_cast<int>(sizeof(Color4b)); // TODO: stride should be moved to image class
+    int stride = image.width() * static_cast<int>(sizeof(ColorRGBA4b)); // TODO: stride should be moved to image class
     uint8_t* out = nullptr;
     auto encoded_size = WebPEncodeLosslessRGBA(image.data(), image.width(), image.height(), stride, &out);
 
