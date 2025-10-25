@@ -7,9 +7,9 @@
 #ifndef De_Vertexwahn_Core_ObjectFactory_b184faf0_dc66_451e_a52f_615a4caa7c35_h
 #define De_Vertexwahn_Core_ObjectFactory_b184faf0_dc66_451e_a52f_615a4caa7c35_h
 
-#include "core/namespace.h"
-#include "core/object.h"
-#include "core/reference_counted.h"
+#include "core/namespace.hpp"
+#include "core/object.hpp"
+#include "core/reference_counted.hpp"
 
 #include <exception>
 #include <functional>

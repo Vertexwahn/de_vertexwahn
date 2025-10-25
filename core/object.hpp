@@ -7,10 +7,10 @@
 #ifndef De_Vertexwahn_Core_Object_ccb5c1f6_846a_4ff1_82b1_06a8edae8bf0_h
 #define De_Vertexwahn_Core_Object_ccb5c1f6_846a_4ff1_82b1_06a8edae8bf0_h
 
-#include "core/namespace.h"
-#include "core/non_copyable.h"
+#include "core/namespace.hpp"
+#include "core/non_copyable.hpp"
 
-#include <string>
+#include "core/stl/string.hpp"
 
 DE_VERTEXWAHN_BEGIN_NAMESPACE
 
@@ -21,7 +21,7 @@ public:
     virtual ~Object() = default;
 
     [[nodiscard]]
-    virtual std::string to_string() const;
+    virtual string to_string() const;
 };
 
 DE_VERTEXWAHN_END_NAMESPACE

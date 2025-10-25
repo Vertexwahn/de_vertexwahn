@@ -3,7 +3,7 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-#include "core/property_set.h"
+#include "core/property_set.hpp"
 
 #include "gmock/gmock.h"
 
@@ -53,6 +53,29 @@ TEST(PropertySet, TestBasicTypes) {
     EXPECT_THAT(ps.get_property<std::string>("longer_variable_name"), "some_string");
 }
 
+TEST(PropertySet, multiple_additons) {
+    using VariantType = std::variant<int>;
+    using PropertySet = PropertySetType<VariantType>;
+
+    PropertySet ps;
+    ps.add_property("a", 1).add_property("b", 2);
+
+    EXPECT_THAT(ps.get_property<int>("a"), 1);
+    EXPECT_THAT(ps.get_property<int>("b"), 2);
+}
+
+TEST(PropertySet, nested_properties) {
+    using VariantType = std::variant<int>;
+    using PropertySet = PropertySetType<VariantType>;
+
+    PropertySet ps;
+    ps.add_property("a", 1);
+
+    std::shared_ptr<de_vertexwahn::PropertySetType<std::variant<int>>> child = std::make_shared<PropertySet>();
+    child->add_property("b", 2);
+    ps.add_child("c", child);
+}
+
 TEST(PropertySet, When_PropertyDoesNotExist_Then_RaiseException) {
     using VariantType = std::variant<int>;
     using PropertySet = PropertySetType<VariantType>;
@@ -85,7 +108,7 @@ TEST(PropertySet, WhenPropertyDoesNotExist_Then_ReturnDefaultValue) {
     using PropertySet = PropertySetType<VariantType>;
 
     PropertySet ps;
-    EXPECT_THAT(ps.get_property("notExistingProperty", 42), testing::Eq(42));
+    EXPECT_THAT(ps.get_property("not_existing_property", 42), testing::Eq(42));
 }
 
 TEST(PropertySet, CopyCtor) {

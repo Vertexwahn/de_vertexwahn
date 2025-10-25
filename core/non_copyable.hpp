@@ -7,7 +7,7 @@
 #ifndef De_Vertexwahn_Core_NonCopyable_3f4e4740_1b8d_4586_bd61_5a05427206e4_h
 #define De_Vertexwahn_Core_NonCopyable_3f4e4740_1b8d_4586_bd61_5a05427206e4_h
 
-#include "core/namespace.h"
+#include "core/namespace.hpp"
 
 #include "boost/core/noncopyable.hpp"
 
